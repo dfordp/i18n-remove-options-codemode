@@ -1,17 +1,20 @@
 {
   "$schema": "https://codemod-utils.s3.us-west-1.amazonaws.com/configuration_schema.json",
-  "name": "i18n-remove-options",
+  "name": "i18n/v23.0.0/remove-options",
   "version": "1.0.0",
   "engine": "jscodeshift",
   "private": false,
   "arguments": [],
   "meta": {
     "tags": [
-      "react-i18n",
+      "i18n",
       "breaking changes",
       "v22.x.x to v23.0.0",
       "Removing NormalizeByTypeOptions type."
     ],
     "git": "https://github.com/dfordp/i18n-remove-options-codemode"
+  },
+  "applicability": {
+    "from" : [ ["react-i18next", ">=" , "23.0.0" ] ]
   }
 }
