@@ -1,6 +1,6 @@
 {
   "$schema": "https://codemod-utils.s3.us-west-1.amazonaws.com/configuration_schema.json",
-  "name": "i18n/v23.0.0/remove-options",
+  "name": "i18n/23/remove-options",
   "version": "1.0.0",
   "engine": "jscodeshift",
   "private": false,
