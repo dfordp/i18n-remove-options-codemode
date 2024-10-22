@@ -1,42 +1,58 @@
-export default function transform(file, api) {
+export default function transform(file, api, options) {
   const j = api.jscodeshift;
   const root = j(file.source);
   let dirtyFlag = false;
 
-  // Find the variable declaration for `options`
-  root.find(j.VariableDeclaration).forEach((path) => {
-    const declaration = path.node.declarations[0];
-    if (
-      j.Identifier.check(declaration.id) &&
-      declaration.id.name === 'options'
-    ) {
-      // Remove the variable declaration
-      j(path).remove();
-      dirtyFlag = true;
-    }
-  });
-
-  // Find the i18n.init call and remove the `options` property
+  // Find all i18n.init function calls
   root.find(j.CallExpression, {
-    callee: { object: { name: 'i18n' }, property: { name: 'init' } },
-  }).forEach((path) => {
+    callee: {
+      object: { name: 'i18n' },
+      property: { name: 'init' }
+    }
+  }).forEach(path => {
     const args = path.node.arguments;
-    if (args.length > 0 && j.ObjectExpression.check(args[0])) {
+    if (args.length === 1 && j.ObjectExpression.check(args[0])) {
       const properties = args[0].properties;
-      const newProperties = properties.filter((prop) => {
-        if (
-          j.Property.check(prop) &&
-          j.Identifier.check(prop.key) &&
-          prop.key.name === 'options'
-        ) {
-          dirtyFlag = true;
-          return false;
+
+      // Filter out 'options' and 'interpolation' properties
+      const filteredProperties = properties.filter(prop => {
+        if (j.ObjectProperty.check(prop) && j.Identifier.check(prop.key)) {
+          const keyName = prop.key.name;
+          return keyName !== 'options' && keyName !== 'interpolation';
         }
         return true;
       });
-      args[0].properties = newProperties;
+
+      // If any properties were removed, update the node
+      if (filteredProperties.length !== properties.length) {
+        args[0].properties = filteredProperties;
+        dirtyFlag = true;
+      }
+    }
+  });
+
+  // Remove the 'options' variable declaration if it exists
+  root.find(j.VariableDeclaration).forEach(path => {
+    const declarations = path.node.declarations;
+    const filteredDeclarations = declarations.filter(decl => {
+      if (j.VariableDeclarator.check(decl) && j.Identifier.check(decl.id)) {
+        return decl.id.name !== 'options';
+      }
+      return true;
+    });
+
+    if (filteredDeclarations.length !== declarations.length) {
+      if (filteredDeclarations.length === 0) {
+        j(path).remove();
+      } else {
+        path.node.declarations = filteredDeclarations;
+      }
+      dirtyFlag = true;
     }
   });
 
   return dirtyFlag ? root.toSource() : undefined;
 }
+
+
+export const parser = "tsx";

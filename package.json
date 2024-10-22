@@ -1,5 +1,5 @@
 {
-  "name": "i18n-remove-options",
+  "name": "i18next-21-remove-options-and-interpolation",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "20.9.0",

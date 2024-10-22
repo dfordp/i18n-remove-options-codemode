@@ -3,19 +3,7 @@ const options = {
     escapeValue: false,
   },
 };
-
+//remove the options object property and keep all other relevant properties
 i18n.init({
-  lng: 'en',
-  backend: {
-    loadPath: '/locales/{{lng}}/{{ns}}.json',
-  },
-  normalize: (type, value) => {
-    switch (type) {
-      case 'translation':
-        return value.toUpperCase(); // Custom normalization for translations
-      default:
-        return value;
-    }
-  },
   options,
 });
